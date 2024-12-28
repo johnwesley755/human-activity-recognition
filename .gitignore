@@ -1,0 +1,11 @@
+# Ignore virtual environment folders
+venv/
+env/
+
+# Ignore Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore environment variables (if you use .env files for secrets)
+.env
