@@ -1,7 +1,3 @@
-Here’s a `README.md` template for your **Human Activity Recognition** project, which you can customize as needed:
-
----
-
 # Human Activity Recognition (HAR)
 
 This project involves the use of machine learning techniques to recognize human activities based on sensor data from smartphones. It uses the UCI Human Activity Recognition (HAR) dataset, which contains data from accelerometers and gyroscopes to classify different human activities such as walking, sitting, and standing.
@@ -107,5 +103,3 @@ We welcome contributions to improve the project. If you'd like to contribute, fo
 5. Open a pull request
 
 ---
-
-This `README.md` includes sections such as how to set up the environment, usage instructions, model training details, and how others can contribute to your project. Let me know if you need further adjustments!
