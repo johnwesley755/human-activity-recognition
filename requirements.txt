@@ -3,3 +3,5 @@ pandas
 tensorflow
 scikit-learn
 matplotlib
+openpyxl
+joblib

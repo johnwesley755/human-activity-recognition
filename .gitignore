@@ -9,3 +9,17 @@ __pycache__/
 
 # Ignore environment variables (if you use .env files for secrets)
 .env
+
+# Ignore Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore data files
+data/*.csv
+
+# Ignore system files
+.DS_Store
+
+# Ignore model files
+*.pkl

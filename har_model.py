@@ -1,63 +1,67 @@
-import numpy as np
 import pandas as pd
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.utils import to_categorical
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import classification_report
-
-# Paths to dataset
-DATASET_PATH = "UCI HAR Dataset/"
-
-def load_data(file_path):
-    """Load data from a given file path."""
-    return pd.read_csv(file_path, delim_whitespace=True, header=None)
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
 
 # Load training and testing datasets
-X_train = load_data(DATASET_PATH + "train/X_train.txt")
-y_train = load_data(DATASET_PATH + "train/y_train.txt")
-X_test = load_data(DATASET_PATH + "test/X_test.txt")
-y_test = load_data(DATASET_PATH + "test/y_test.txt")
+train_data = pd.read_csv('data/train.csv')
+test_data = pd.read_csv('data/test.csv')
 
-# Encode target labels
-encoder = LabelEncoder()
-y_train = encoder.fit_transform(y_train.values.ravel())
-y_test = encoder.transform(y_test.values.ravel())
+# Display the first few rows of the datasets
+print("Training Data:")
+print(train_data.head())
 
-# One-hot encode target labels
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+print("\nTesting Data:")
+print(test_data.head())
 
-# Define the model
-model = Sequential([
-    Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
-    Dropout(0.5),
-    Dense(64, activation='relu'),
-    Dropout(0.5),
-    Dense(y_train.shape[1], activation='softmax')  # Output layer
-])
+# Check for missing values
+print("\nMissing values in training data:", train_data.isnull().sum().sum())
+print("Missing values in testing data:", test_data.isnull().sum().sum())
 
-# Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+# Separate features (X) and labels (y)
+# Assuming 'Activity' is the target column and the rest are features
+X_train = train_data.drop(columns=['Activity'])
+y_train = train_data['Activity']
 
-# Train the model
-history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_split=0.2)
+X_test = test_data.drop(columns=['Activity'])
+y_test = test_data['Activity']
 
-# Evaluate the model
-test_loss, test_accuracy = model.evaluate(X_test, y_test)
-print(f"Test Accuracy: {test_accuracy:.2f}")
+# Encode labels (if necessary)
+label_encoder = LabelEncoder()
+y_train = label_encoder.fit_transform(y_train)
+y_test = label_encoder.transform(y_test)
 
-# Generate a classification report
-y_pred = model.predict(X_test)
-y_pred_classes = np.argmax(y_pred, axis=1)
-y_test_classes = np.argmax(y_test, axis=1)
-print(classification_report(y_test_classes, y_pred_classes, target_names=encoder.classes_.astype(str)))
+# Scale the feature data
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-# Plot training and validation accuracy
-import matplotlib.pyplot as plt
-plt.plot(history.history['accuracy'], label='Training Accuracy')
-plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
+# Split the training data into training and validation sets
+X_train_split, X_val_split, y_train_split, y_val_split = train_test_split(
+    X_train, y_train, test_size=0.2, random_state=42
+)
+
+# Train a Random Forest Classifier
+print("\nTraining the Random Forest Classifier...")
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train_split, y_train_split)
+
+# Validate the model on the validation set
+print("\nValidating the model on validation data...")
+y_val_pred = model.predict(X_val_split)
+print("Validation Accuracy:", accuracy_score(y_val_split, y_val_pred))
+print("\nValidation Classification Report:")
+print(classification_report(y_val_split, y_val_pred))
+
+# Evaluate the model on the test set
+print("\nEvaluating the model on test data...")
+y_test_pred = model.predict(X_test)
+print("Test Accuracy:", accuracy_score(y_test, y_test_pred))
+print("\nTest Classification Report:")
+print(classification_report(y_test, y_test_pred))
+
+# Save the trained model (optional)
+import joblib
+joblib.dump(model, 'activity_model.pkl')
+print("\nModel saved as 'activity_model.pkl'")
