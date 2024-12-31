@@ -15,11 +15,11 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Ignore data files
-data/*.csv
-
 # Ignore system files
 .DS_Store
 
 # Ignore model files
 *.pkl
+
+# Ignore all CSV files in the repository
+*.csv
